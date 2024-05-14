@@ -34,7 +34,7 @@ typedef struct
 } User;
 
 User users[] = {
-    {"valmik", "valmiklibray"},
+    {"valmik", "valmiklibrary"},
     // {"user2", "password2"},
     // Add more users as needed
 };
