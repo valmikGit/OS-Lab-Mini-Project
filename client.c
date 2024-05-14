@@ -45,9 +45,36 @@ int main()
 
     // Send password to server
     send(client_socket, password, strlen(password), 0);
+    printf("Sent username and password to server and Waiting for server to respond\n");
 
+    // Set timeout for receiving server response
+    struct timeval timeout;
+    timeout.tv_sec = TIMEOUT_SECONDS;
+    timeout.tv_usec = 0;
+    if (setsockopt(client_socket, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout)) < 0)
+    {
+        perror("Error setting timeout");
+        exit(EXIT_FAILURE);
+    }
     // Receive authentication result from server
-    recv(client_socket, auth_message, sizeof(auth_message), 0);
+    // Receive authentication result from server with timeout and retry logic
+    int attempts = 0;
+    while (attempts < MAX_ATTEMPTS)
+    {
+        if (recv(client_socket, auth_message, sizeof(auth_message), 0) > 0)
+        {
+            printf("%s\n", auth_message);
+            break; // Exit the loop if response received successfully
+        }
+        else
+        {
+            attempts++;
+            printf("Attempt %d: No response from server. Retrying...\n", attempts);
+            // Resend username and password
+            send(client_socket, username, strlen(username), 0);
+            send(client_socket, password, strlen(password), 0);
+        }
+    }
     printf("%s\n", auth_message);
 
     if (strcmp(auth_message, "Authentication successful") == 0)

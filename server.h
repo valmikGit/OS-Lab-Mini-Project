@@ -20,7 +20,7 @@
 #define MAX_BOOK_AUTHOR_LENGTH 100
 // Function prototypes
 void *handle_client(void *arg);
-void authenticate_user(int client_socket);
+int authenticate_user(int client_socket);
 void manage_books(int client_socket);
 void add_book(int client_socket);
 void delete_book(int client_socket);

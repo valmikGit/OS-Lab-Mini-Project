@@ -1,4 +1,3 @@
-
 #include "server.h"
 typedef struct
 {
@@ -16,6 +15,7 @@ typedef struct
 
 User users[] = {
     {"valmik", "valmiklibrary"},
+    {"f", "f"}
     // {"user2", "password2"},
     // Add more users as needed
 };
@@ -29,8 +29,6 @@ typedef struct
     int is_issued; // Flag to indicate if the book is currently issued or not
     int issued_to; // Member ID of the member to whom the book is issued
 } Book;
-
-
 
 int main()
 {
@@ -125,11 +123,27 @@ int main()
 // Function to handle client requests
 void *handle_client(void *arg)
 {
+    printf("(inside handle client done)---\n");
     int client_socket = *((int *)arg);
+    printf("Client socket: %d . If it is -1 then we have a problem.\n", client_socket);
+    // Verify if the client socket is valid
+    if (client_socket < 0) {
+        perror("Invalid client socket descriptor");
+        return NULL; // Return or handle the error appropriately
+    }
+
 
     // Step 1: Authenticate the user
-    authenticate_user(client_socket);
+    printf("now doing auth user---\n");
+    if (authenticate_user(client_socket))
+    {
 
+        printf("Auth user done");
+    }
+    else
+    {
+        printf("Auth user failed");
+    }
     // Step 2: Present menu options and handle client requests
     char choice;
     do
@@ -176,17 +190,28 @@ void *handle_client(void *arg)
 }
 
 // Dummy authentication function
-void authenticate_user(int client_socket)
+int authenticate_user(int client_socket)
 {
     char username[MAX_USERNAME_LENGTH];
     char password[MAX_PASSWORD_LENGTH];
     char auth_message[100];
 
     // Receive username from client
-    recv(client_socket, username, sizeof(username), 0);
+
+    printf("(inside auth user) Ready to receive client auth data\n");
+    int bytes_received = recv(client_socket, username, sizeof(username), 0);
+    if (bytes_received < 0)
+    {
+        perror("Error receiving username from client");
+        // Handle error appropriately, e.g., close the connection
+        close(client_socket);
+        return 0;
+    }
 
     // Receive password from client
     recv(client_socket, password, sizeof(password), 0);
+    // while ((getchar()) != '\n');
+    printf("Recieved username: %s and pwd %s ", username, password);
 
     // Dummy authentication logic
     int authenticated = 0;
@@ -195,8 +220,13 @@ void authenticate_user(int client_socket)
         if (strcmp(username, users[i].username) == 0 && strcmp(password, users[i].password) == 0)
         {
             authenticated = 1;
+            printf(" is matched to %s\n", users[i].username);
             break;
         }
+        // else{
+        //     printf("Username: %s vs received username:%s\n", users[i].username, username);
+        //     printf("Password: %s vs received pass: %s\n", users[i].password, password);
+        // }
     }
 
     // Send authentication result to client
@@ -209,6 +239,8 @@ void authenticate_user(int client_socket)
         strcpy(auth_message, "Authentication failed");
     }
     send(client_socket, auth_message, strlen(auth_message), 0);
+    printf("authenticted: %d\n", authenticated);
+    return authenticated;
 }
 
 // Function to manage books
@@ -780,7 +812,6 @@ int generate_unique_book_id()
     return ++counter;
 }
 
-
 // Function to issue a book to a member
 void issue_book(int client_socket)
 {
@@ -848,7 +879,7 @@ void return_book(int client_socket)
     printf("Enter your member_id\n");
     scanf("%d", &member_id);
     printf("Enter the ID of the book you want to return.\n");
-    scanf("%d", &book_id);    
+    scanf("%d", &book_id);
     // Open the file for reading and writing in binary mode
     FILE *file = fopen(FILENAME, "rb+");
     if (file == NULL)
