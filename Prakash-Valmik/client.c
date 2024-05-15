@@ -30,6 +30,7 @@ void read_server_response(int sock)
 
 void send_input_to_server(int sock)
 {
+    printf(" (fgets taking ip here) ");
     char buffer[BUF_SIZE];
     fgets(buffer, BUF_SIZE, stdin);
     trim_newline(buffer); // Trim newline character
@@ -46,7 +47,10 @@ void handle_menu(int sock)
     while (1)
     {
         // Read menu options from the server
-        bytes_read = read(sock, buffer, BUF_SIZE - 1);
+        printf("Inside (handle_menu) while loop\n");
+        // bytes_read = read(sock, buffer, BUF_SIZE - 1);
+        // ------->>>ERROR IS COMING IN LINE ABOVE. It is never coming out of read
+        // printf("read in (handle_menu) finished\n");
         buffer[bytes_read] = '\0'; // Ensure null-terminated string
         printf("Server menu:\n%s", buffer); // Print menu options
 
@@ -124,8 +128,16 @@ int main()
         //     }
         // }
         // Handle menu options for non-admin users
-        if (strstr(buffer, "Authentication successful (user)") != NULL)
+
+        // print the buffer
+        // printf("Buffer: %s\n", buffer);
+
+        // ----->>>>>> Error is in line below. The buffer is coming empty
+        if (strstr(buffer, "Authentication successful (user)") != NULL);
+        if(1)
         {
+            // debug print
+            printf("User authenticated\n");
             handle_menu(sock);
         }
     }
