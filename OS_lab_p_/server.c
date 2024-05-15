@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <pthread.h>
 #include <arpa/inet.h>
+#include <pthread.h>
 #include "books.h"
 #include "users.h"
 
@@ -50,6 +50,59 @@ void issue_book(int client_socket)
 void return_book(int client_socket)
 {
     // Implement book returning here
+}
+
+// Function to send menu options to the client
+void send_menu(int client_socket, int is_admin)
+{
+    char buffer[BUF_SIZE];
+    if (is_admin)
+    {
+        snprintf(buffer, BUF_SIZE, "Admin menu: 1. Display all books\n2. Issue a book\n3. Return a book\n4. Exit\n");
+    }
+    else
+    {
+        snprintf(buffer, BUF_SIZE, "User menu: 1. Display all books\n2. Issue a book\n3. Return a book\n4. Exit\n");
+    }
+    send(client_socket, buffer, strlen(buffer), 0);
+}
+
+// Function to handle user actions based on the selected option
+void handle_user_actions(int client_socket, int is_admin)
+{
+    char buffer[BUF_SIZE];
+    int bytes_read;
+
+    while (1)
+    {
+        // Send menu options to the client
+        send_menu(client_socket, is_admin);
+
+        // Read user's choice
+        bytes_read = read(client_socket, buffer, BUF_SIZE - 1);
+        buffer[bytes_read] = '\0'; // Ensure null-terminated string
+        int action = atoi(buffer);
+        printf("User selected action: %d\n", action); // Debug print
+
+        switch (action)
+        {
+        case 1:
+            display_books(client_socket);
+            break;
+        case 2:
+            issue_book(client_socket);
+            break;
+        case 3:
+            return_book(client_socket);
+            break;
+        case 4:
+            return; // Exit loop and function
+        default:
+            send(client_socket, "Invalid action.\n", strlen("Invalid action.\n"), 0);
+            printf("Invalid user action: %d\n", action); // Debug print
+            break;
+        }
+    }
 }
 
 void *handle_client(void *arg)
@@ -103,33 +156,7 @@ void *handle_client(void *arg)
         send(client_socket, "Authentication successful (user)\n", strlen("Authentication successful (user)\n"), 0);
         send(client_socket, "You have user privileges.\n", strlen("You have user privileges.\n"), 0);
         printf("User authenticated: %s\n", username); // Debug print
-    }
-
-    // Send menu to the client
-    send(client_socket, "Select an action:\n1. Display all books\n2. Issue a book\n3. Return a book\n", strlen("Select an action:\n1. Display all books\n2. Issue a book\n3. Return a book\n"), 0);
-
-    // Handle user actions based on the selected option
-    bytes_read = read(client_socket, buffer, BUF_SIZE - 1);
-    buffer[bytes_read] = '\0'; // Ensure null-terminated string
-    int action = atoi(buffer);
-    printf("User selected action: %d\n", action); // Debug print
-    fflush(stdout); // Force flush of output buffer
-
-    switch (action)
-    {
-    case 1:
-        display_books(client_socket);
-        break;
-    case 2:
-        issue_book(client_socket);
-        break;
-    case 3:
-        return_book(client_socket);
-        break;
-    default:
-        send(client_socket, "Invalid action.\n", strlen("Invalid action.\n"), 0);
-        printf("Invalid user action: %d\n", action); // Debug print
-        break;
+        handle_user_actions(client_socket, is_admin);
     }
 
     close(client_socket);
