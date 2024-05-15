@@ -1,8 +1,0 @@
-*.out
-*.o
-client
-server
-
-#Others
-*.log
-*.tmp

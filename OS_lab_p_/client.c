@@ -20,7 +20,7 @@ void read_server_response(int sock) {
     int bytes_read = read(sock, buffer, BUF_SIZE - 1);
     if (bytes_read > 0) {
         buffer[bytes_read] = '\0'; // Null-terminate the string
-        printf("Received from server: %s\n", buffer); // Debug print
+        printf("SERVER- \n%s", buffer); // Debug print
     }
 }
 
@@ -72,7 +72,9 @@ int main() {
 
     // Handle server responses
     while (1) {
+        printf("In the while loop\n");
         read_server_response(sock); // Read server's response
+        printf("After read_server_response(sock); in the while loop.\n");
 
         // Check if server prompts for another action
         if (strstr(buffer, "Do you want to perform another action? (yes/no):") != NULL) {
