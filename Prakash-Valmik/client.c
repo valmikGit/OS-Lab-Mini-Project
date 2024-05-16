@@ -30,12 +30,12 @@ void read_server_response(int sock)
 
 void send_input_to_server(int sock)
 {
-    printf(" (fgets taking ip here) ");
+    // printf(" (fgets taking ip here) ");
     char buffer[BUF_SIZE];
     fgets(buffer, BUF_SIZE, stdin);
     trim_newline(buffer); // Trim newline character
     send(sock, buffer, strlen(buffer), 0);
-    printf("Sent to server: %s\n", buffer); // Debug print
+    // printf("Sent to server: %s\n", buffer); // Debug print
 }
 
 // Function to handle menu options received from the server
@@ -47,21 +47,22 @@ void handle_menu(int sock)
     while (1)
     {
         // Read menu options from the server
-        printf("Inside (handle_menu) while loop\n");
+        // printf("Inside (handle_menu) while loop\n");
         // bytes_read = read(sock, buffer, BUF_SIZE - 1);
         // ------->>>ERROR IS COMING IN LINE ABOVE. It is never coming out of read
         // printf("read in (handle_menu) finished\n");
-        buffer[bytes_read] = '\0'; // Ensure null-terminated string
-        printf("Server menu:\n%s", buffer); // Print menu options
+        // buffer[bytes_read] = '\0'; // Ensure null-terminated string
+        // printf("\n%s", buffer); // Print menu options
 
         // Prompt user for action
         printf("Enter your choice: ");
         send_input_to_server(sock); // Send user's choice to the server
 
         // Read server's response
-        bytes_read = read(sock, buffer, BUF_SIZE - 1);
-        buffer[bytes_read] = '\0'; // Ensure null-terminated string
-        printf("Server response: %s\n", buffer); // Print server response
+        // bytes_read = read(sock, buffer, BUF_SIZE - 1);
+        read_server_response(sock);
+        // buffer[bytes_read] = '\0'; // Ensure null-terminated string
+        // printf("%s\n", buffer); // Print server response
 
         if (strstr(buffer, "Exit") != NULL)
         {
@@ -115,9 +116,9 @@ int main()
     // Handle server responses
     while (1)
     {
-        printf("In the while loop\n");
+        // printf("In the while loop\n");
         read_server_response(sock); // Read server's response
-        printf("After read_server_response(sock); in the while loop.\n");
+        // printf("After read_server_response(sock); in the while loop.\n");
 
         // Check if server prompts for another action
         // if (strstr(buffer, "Do you want to perform another action? (yes/no):") != NULL) {
@@ -137,7 +138,7 @@ int main()
         if(1)
         {
             // debug print
-            printf("User authenticated\n");
+            // printf("User authenticated\n");
             handle_menu(sock);
         }
     }

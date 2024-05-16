@@ -36,7 +36,7 @@ void display_books(int client_socket)
     {
         snprintf(buffer, BUF_SIZE, "%d: %s\n", i + 1, books[i]);
         send(client_socket, buffer, strlen(buffer), 0);
-        usleep(2000); // Small delay to ensure data is sent properly
+        usleep(1); // Small delay to ensure data is sent properly
     }
 }
 
@@ -58,11 +58,11 @@ void send_menu(int client_socket, int is_admin)
     char buffer[BUF_SIZE];
     if (is_admin)
     {
-        snprintf(buffer, BUF_SIZE, "Admin menu: 1. Display all books\n2. Issue a book\n3. Return a book\n4. Exit\n");
+        snprintf(buffer, BUF_SIZE, "Admin menu:\n1. Display all books\n2. Issue a book\n3. Return a book\n4. Exit\n");
     }
     else
     {
-        snprintf(buffer, BUF_SIZE, "User menu: 1. Display all books\n2. Issue a book\n3. Return a book\n4. Exit\n");
+        snprintf(buffer, BUF_SIZE, "User menu:\n1. Display all books\n2. Issue a book\n3. Return a book\n4. Exit\n");
     }
     send(client_socket, buffer, strlen(buffer), 0);
 }
@@ -154,7 +154,7 @@ void *handle_client(void *arg)
     else
     {
         send(client_socket, "Authentication successful (user)\n", strlen("Authentication successful (user)\n"), 0);
-        send(client_socket, "You have privileges.\n", strlen("You have user privileges.\n"), 0);
+        send(client_socket, "You have user privileges.\n", strlen("You have user privileges.\n"), 0);
         printf("User authenticated: %s\n", username); // Debug print
         handle_user_actions(client_socket, is_admin);
     }
