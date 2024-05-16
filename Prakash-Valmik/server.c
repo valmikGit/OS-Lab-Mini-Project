@@ -43,14 +43,57 @@ void display_books(int client_socket)
 // Function to handle user's book issuing
 void issue_book(int client_socket)
 {
-    // Implement book issuing here
+    char buffer[BUF_SIZE];
+    int bytes_read;
+
+    // Request book ID from the client
+    send(client_socket, "Enter the ID of the book to issue: ", strlen("Enter the ID of the book to issue: "), 0);
+    bytes_read = read(client_socket, buffer, BUF_SIZE - 1);
+    buffer[bytes_read] = '\0'; // Ensure null-terminated string
+
+    // Convert the input to integer
+    int book_id = atoi(buffer);
+    int NUM_BOOKS = sizeof(books) / sizeof(books[0]) - 1;
+
+    // Check if book ID is valid
+    if (book_id < 1 || book_id > NUM_BOOKS)
+    {
+        send(client_socket, "Invalid book ID.\n", strlen("Invalid book ID.\n"), 0);
+        return;
+    }
+
+    // Implement book issuing logic here
+    // For example, update book status in the database and notify the client
+    send(client_socket, "Book issued successfully.\n", strlen("Book issued successfully.\n"), 0);
 }
 
 // Function to handle user's book returning
 void return_book(int client_socket)
 {
-    // Implement book returning here
+    char buffer[BUF_SIZE];
+    int bytes_read;
+
+    // Request book ID from the client
+    send(client_socket, "Enter the ID of the book to return: ", strlen("Enter the ID of the book to return: "), 0);
+    bytes_read = read(client_socket, buffer, BUF_SIZE - 1);
+    buffer[bytes_read] = '\0'; // Ensure null-terminated string
+
+    // Convert the input to integer
+    int book_id = atoi(buffer);
+    int NUM_BOOKS = sizeof(books) / sizeof(books[0]) - 1;
+
+    // Check if book ID is valid
+    if (book_id < 1 || book_id > NUM_BOOKS)
+    {
+        send(client_socket, "Invalid book ID.\n", strlen("Invalid book ID.\n"), 0);
+        return;
+    }
+
+    // Implement book returning logic here
+    // For example, update book status in the database and notify the client
+    send(client_socket, "Book returned successfully.\n", strlen("Book returned successfully.\n"), 0);
 }
+
 
 // Function to send menu options to the client
 void send_menu(int client_socket, int is_admin)

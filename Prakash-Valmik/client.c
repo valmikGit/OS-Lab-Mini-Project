@@ -70,6 +70,21 @@ void handle_menu(int sock)
         }
     }
 }
+// Function to handle issuing a book
+void handle_issue_book(int sock)
+{
+    read_server_response(sock); // Read server prompt
+    send_input_to_server(sock); // Send book ID to issue
+    read_server_response(sock); // Read server response
+}
+
+// Function to handle returning a book
+void handle_return_book(int sock)
+{
+    read_server_response(sock); // Read server prompt
+    send_input_to_server(sock); // Send book ID to return
+    read_server_response(sock); // Read server response
+}
 
 int main()
 {
@@ -135,7 +150,16 @@ int main()
 
         // ----->>>>>> Error is in line below. The buffer is coming empty
         if (strstr(buffer, "Authentication successful (user)") != NULL);
-        if(1)
+        else if (strstr(buffer, "Enter the ID of the book to issue:") != NULL)
+        {
+            handle_issue_book(sock);
+        }
+        else if (strstr(buffer, "Enter the ID of the book to return:") != NULL)
+        {
+            handle_return_book(sock);
+        }
+
+        if (1)
         {
             // debug print
             // printf("User authenticated\n");
